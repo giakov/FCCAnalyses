@@ -1047,6 +1047,8 @@ namespace FCCAnalyses
       if(VERBOSE) std::cout<<"Array of const p:"<<std::endl;
       if(VERBOSE) std::cout<<const_p<<std::endl;
       if(VERBOSE) std::cout<<"const_p size:\t"<<const_p[0].size()+const_p[1].size()<<std::endl;
+      if(VERBOSE) std::cout<<"Particle size:"<< Particle.size()<<std::endl;
+      if(VERBOSE) std::cout<<"RecPart size:"<< RecPart.size()<<std::endl;
       FCCAnalysesJetConstituentsData tmp;
       tmp.resize(const_p[0].size()+const_p[1].size());
 
@@ -1056,27 +1058,43 @@ namespace FCCAnalyses
       //Loop through jet constituent
       for (int cc = 0; cc < 2; cc++) {
          if(count>1) continue;
+         if(VERBOSE) std::cout<<"cc: "<< cc<<std::endl;
          for (int i = 0; i < const_p[cc].size(); ++i){
             //not sure if found needed?
             found = false;
             filled = false;
+            if(VERBOSE) std::cout<<"Consider new jet const.: "<< const_p[cc][i]<<std::endl;
+            if(VERBOSE) std::cout<<"recin.size(): "<< recin.size()<<std::endl;
             for (size_t it=0; it<recin.size();it++){
               edm4hep::ReconstructedParticleData RecP = RecPart.at(recin.at(it));
               float reco_p = std::sqrt(RecP.momentum.x * RecP.momentum.x + RecP.momentum.y * RecP.momentum.y + RecP.momentum.z * RecP.momentum.z);
               int mc_ind=mcin.at(it);
+              if(VERBOSE) std::cout<<"reco_p: "<< reco_p<<std::endl;
               edm4hep::MCParticleData mcParticle=Particle.at(mc_ind);
               float truth_p = std::sqrt(mcParticle.momentum.x * mcParticle.momentum.x + mcParticle.momentum.y * mcParticle.momentum.y + mcParticle.momentum.z * mcParticle.momentum.z);
-              if (abs(const_p[cc][i]-reco_p)/const_p[cc][i]>1e-5) continue;
+              if(VERBOSE) std::cout<<"truth_p: "<< truth_p<<std::endl;
+              if (abs(const_p[cc][i]-reco_p)/const_p[cc][i]<1e-5){
                 unsigned int constp0_size=const_p[0].size();
+                if(VERBOSE) std::cout<<"FOUND RECO PART!\t"<<mcParticle.PDG<<std::endl;
                 if(VERBOSE) std::cout<<"ANDREA truth PDG ID:\t"<<mcParticle.PDG<<std::endl;
                 tmp[cc * constp0_size + i]=mcParticle.PDG;
                 found=true;
-                break;
+                break;}
+              if(VERBOSE) std::cout<<"it: "<<it<<std::endl;
+              if ((it+1) == recin.size()){
+                if(VERBOSE) std::cout<<"Dummy value, no match founs -99\t"<<std::endl;
+                tmp[cc * const_p[0].size() + i]=-99;
+                found=true;
+              }
             }
         } 
       } 
       count ++;
+      if(VERBOSE) std::cout<<"Out of jet const. loop\t"<<std::endl;
+      if(VERBOSE) std::cout<<"found: \t"<< found<<std::endl;
+      if(VERBOSE) std::cout<<"filled: \t"<< filled<<std::endl;
       if(count==1 && found && !filled) {
+        if(VERBOSE) std::cout<<"Sorting out output\t"<<std::endl;
         filled=true;
         for (int it=0; it<tmp.size(); it++) { if (tmp[it]==0) tmp[it]=22; }
         FCCAnalysesJetConstituentsData tmp2, tmp3;
