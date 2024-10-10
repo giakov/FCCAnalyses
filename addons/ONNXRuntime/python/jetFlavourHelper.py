@@ -224,8 +224,8 @@ class JetFlavourHelper:
         ] = "JetConstituentsUtils::count_type(pfcand_isNeutralHad{})".format(self.tag)
         
         ### ANDREA --
-        self.definition["pfcand_truthPID{}".format(self.tag)] = "JetConstituentsUtils::get_PIDs({}, {}, {}, {}, {}, {})".format(
-            self.mcrecoZero, self.mcrecoOne, self.pfcand, self.particle, self.jets, self.const
+        self.definition["pfcand_truthPID{}".format(self.tag)] = "JetConstituentsUtils::get_PIDs({}, {}, {}, {}, {})".format(
+            self.mcrecoZero, self.mcrecoOne, self.pfcand, self.particle, self.const
 ### WRONG on purpose
 #            self.mcrecoOne, self.mcrecoZero, self.pfcand, self.particle, self.jets#jet
         )
